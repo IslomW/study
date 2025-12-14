@@ -1,0 +1,19 @@
+quarkus:
+  datasource:
+    db-kind: postgresql
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/study
+
+    username: postgres
+    password: 1234
+
+  hibernate-orm:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    database:
+      generation: update
+    log:
+      sql: true
+
+
+jwt:
+  secret: 022ad832a4cd5f55d73d6c3ce90716a3
