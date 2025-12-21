@@ -46,7 +46,6 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponse(
                 token,
                 refreshToken,
-                "Bearer",
                 jwtService.getAccessTokenTtl()
 
         );
@@ -69,7 +68,6 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponse(
                 token,
                 refreshToken.getToken(),
-                "Bearer",
                 jwtService.getAccessTokenTtl()
 
         );
@@ -90,7 +88,6 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponse(
                 newToken,
                 newRefreshToken.getToken(),
-                "Bearer",
                 jwtService.getAccessTokenTtl());
     }
 

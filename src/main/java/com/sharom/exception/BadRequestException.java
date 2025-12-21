@@ -26,5 +26,9 @@ public class BadRequestException extends RuntimeException {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.USER_ALREADY_EXISTS.getCode());
     }
 
+    public static BadRequestException vocabularyNotFound() {
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
+    }
+
 
 }
