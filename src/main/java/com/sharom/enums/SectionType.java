@@ -1,4 +1,4 @@
-package com.sharom.entity;
+package com.sharom.enums;
 
 public enum SectionType {
     LISTENING, READING, WRITING

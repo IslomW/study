@@ -1,5 +1,6 @@
 package com.sharom.entity;
 
+import com.sharom.enums.TopikType;
 import jakarta.persistence.*;
 
 @Entity

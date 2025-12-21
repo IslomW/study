@@ -30,5 +30,9 @@ public class BadRequestException extends RuntimeException {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
     }
 
+    public static BadRequestException invalidPosType() {
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.INVALID_PASSWORD.getCode());
+    }
+
 
 }

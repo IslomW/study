@@ -1,18 +1,16 @@
 package com.sharom.service.impl;
 
-import com.sharom.entity.ExamplePair;
-import com.sharom.entity.Level;
-import com.sharom.entity.PosType;
-import com.sharom.entity.VocabularyWord;
+import com.sharom.entity.*;
+import com.sharom.enums.PosType;
 import com.sharom.exception.BadRequestException;
 import com.sharom.repository.ExamplePairRepository;
+import com.sharom.repository.LevelRepository;
 import com.sharom.repository.VocabularyRepository;
 import com.sharom.service.VocabularyService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
@@ -20,11 +18,13 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     private final VocabularyRepository vocabularyRepository;
     private final ExamplePairRepository examplePairRepository;
+    private final LevelRepository levelRepository;
 
 
-    public VocabularyServiceImpl(VocabularyRepository vocabularyRepository, ExamplePairRepository examplePairRepository) {
+    public VocabularyServiceImpl(VocabularyRepository vocabularyRepository, ExamplePairRepository examplePairRepository, LevelRepository levelRepository) {
         this.vocabularyRepository = vocabularyRepository;
         this.examplePairRepository = examplePairRepository;
+        this.levelRepository = levelRepository;
     }
 
     @Override
@@ -72,15 +72,15 @@ public class VocabularyServiceImpl implements VocabularyService {
     }
 
     @Override
-    public List<VocabularyWord> getAllWordsFiltered(Level level, PosType posType,int page, int size, String sortBy) {
+    public List<VocabularyWord> getAllWordsFiltered(int level, String posType,int page, int size, String sortBy) {
         return vocabularyRepository.findFiltered(
-                level, posType, page, size, sortBy
+                parhseLevel(level), parsePosType(posType), page, size, sortBy
         );
     }
 
     @Override
-    public VocabularyWord getRandomWordByLevel(Level level) {
-        long total = vocabularyRepository.countByLevel(level);
+    public VocabularyWord getRandomWordByLevel(int level) {
+        long total = vocabularyRepository.countByLevel(parhseLevel(level));
 
         if (total == 0) {
             return null;
@@ -90,7 +90,7 @@ public class VocabularyServiceImpl implements VocabularyService {
                 .nextInt((int) total);
 
         return vocabularyRepository
-                .findRandomByLevel(level, randomIndex);
+                .findRandomByLevel(parhseLevel(level), randomIndex);
     }
 
     @Override
@@ -106,4 +106,22 @@ public class VocabularyServiceImpl implements VocabularyService {
     public void deleteWord(Long wordId) {
         vocabularyRepository.deleteById(wordId);
     }
+
+    private Level parhseLevel(int level){
+        return levelRepository.findByLevel(level)
+                .orElseThrow(BadRequestException::vocabularyNotFound);
+    }
+
+    private PosType parsePosType(String posType) {
+        if (posType == null || posType.isBlank()) {
+            return null;
+        }
+
+        try {
+            return PosType.valueOf(posType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw BadRequestException.invalidPosType();
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.sharom.entity;//package com.sharom.entity;
 
 
+import com.sharom.enums.PosType;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

@@ -1,12 +1,9 @@
 package com.sharom.service;
 
 import com.sharom.entity.ExamplePair;
-import com.sharom.entity.Level;
-import com.sharom.entity.PosType;
 import com.sharom.entity.VocabularyWord;
 
 import java.util.List;
-import java.util.Map;
 
 public interface VocabularyService {
 
@@ -18,9 +15,9 @@ public interface VocabularyService {
 
     VocabularyWord getWordById(Long id);
 
-    List<VocabularyWord> getAllWordsFiltered(Level level, PosType posType, int page, int size, String sortBy);
+    List<VocabularyWord> getAllWordsFiltered(int level, String posType, int page, int size, String sortBy);
 
-    VocabularyWord getRandomWordByLevel(Level level);
+    VocabularyWord getRandomWordByLevel(int level);
 
     void deleteExampleSentence(Long exampleId);
 

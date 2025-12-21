@@ -6,7 +6,7 @@ import com.sharom.dto.LoginResponse;
 import com.sharom.dto.RefreshRequest;
 import com.sharom.dto.RegisterRequest;
 import com.sharom.entity.RefreshToken;
-import com.sharom.entity.Role;
+import com.sharom.enums.Role;
 import com.sharom.entity.User;
 import com.sharom.exception.BadRequestException;
 import com.sharom.repository.UserRepository;

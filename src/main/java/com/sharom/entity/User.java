@@ -1,5 +1,7 @@
 package com.sharom.entity;
 
+import com.sharom.enums.Role;
+import com.sharom.enums.UserStatus;
 import jakarta.persistence.*;
 
 

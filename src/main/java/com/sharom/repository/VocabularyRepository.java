@@ -1,7 +1,7 @@
 package com.sharom.repository;
 
 import com.sharom.entity.Level;
-import com.sharom.entity.PosType;
+import com.sharom.enums.PosType;
 import com.sharom.entity.VocabularyWord;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import io.quarkus.panache.common.Page;
