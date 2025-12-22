@@ -19,6 +19,8 @@ public class User extends AuditEntity {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    private String lang;
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "target_level_id")
 //    private Level targetLevel;
@@ -79,5 +81,13 @@ public class User extends AuditEntity {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }

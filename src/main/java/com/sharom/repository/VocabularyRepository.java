@@ -11,6 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
@@ -53,4 +54,23 @@ public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
                 .page(Page.of(index, 1))
                 .firstResult();
     }
+
+    public List<String> findRandomWordsExcluding(Long excludeWordId, int count) {
+        List<VocabularyWord> words = list("id != ?1", excludeWordId);
+        return words.stream()
+                .map(VocabularyWord::getWord)
+                .sorted((a, b) -> (int) (Math.random() * 1000)) // перемешиваем
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    public List<VocabularyWord> findLearnedWords(Long userId) {
+        return list(
+                "SELECT w FROM VocabularyWord w JOIN UserLearnedWord ulw ON ulw.word = w " +
+                        "WHERE ulw.user.id = ?1 AND ulw.learned = true",
+                userId
+        );
+    }
+
+
 }

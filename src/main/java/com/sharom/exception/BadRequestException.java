@@ -21,6 +21,14 @@ public class BadRequestException extends RuntimeException {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.USER_NOT_FOUND.getCode());
     }
 
+    public static BadRequestException dataNotFound(){
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
+    }
+
+    public static BadRequestException levelNotFound(){
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
+    }
+
 
     public static BadRequestException userAlreadyExists() {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.USER_ALREADY_EXISTS.getCode());
@@ -32,6 +40,10 @@ public class BadRequestException extends RuntimeException {
 
     public static BadRequestException invalidPosType() {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.INVALID_PASSWORD.getCode());
+    }
+
+    public static BadRequestException examplePariNotFound() {
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.EXAMPLE_NOT_FOUND.getCode());
     }
 
 

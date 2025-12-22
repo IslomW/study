@@ -18,7 +18,7 @@ public class GrammarRuleTranslation extends BaseEntity{
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "grammarRuleExample", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "grammarRuleTranslation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GrammarRuleExample> examples = new ArrayList<>();
 
 

@@ -2,24 +2,24 @@ package com.sharom.service;
 
 import com.sharom.entity.ExamplePair;
 import com.sharom.entity.VocabularyWord;
-
-import java.util.List;
+import com.sharom.entity.VocabularyWordTranslation;
+import com.sharom.enums.PosType;
 
 public interface VocabularyService {
 
-    VocabularyWord addWord(VocabularyWord word);
+    VocabularyWord createWord(String word, PosType posType, Long levelId);
 
-    VocabularyWord addSentenceById(Long id, List<ExamplePair> sentences);
+    VocabularyWordTranslation addTranslation(Long wordId, String lang, String translationText);
 
-    VocabularyWord updateWord(Long id, VocabularyWord word);
+    ExamplePair addExample(Long translationId, String exampleText);
 
-    VocabularyWord getWordById(Long id);
+    VocabularyWordTranslation updateTranslation(Long translationId, String newText);
 
-    List<VocabularyWord> getAllWordsFiltered(int level, String posType, int page, int size, String sortBy);
-
-    VocabularyWord getRandomWordByLevel(int level);
-
-    void deleteExampleSentence(Long exampleId);
+    ExamplePair updateExample(Long exampleId, String newText);
 
     void deleteWord(Long wordId);
+
+    void deleteTranslation(Long translationId);
+
+    void deleteExample(Long exampleId);
 }

@@ -14,19 +14,16 @@ public class VocabularyWord extends AuditEntity {
     @Column(nullable = false)
     private String word;
 
-    @Column(name = "translation", nullable = false)
-    private String translation;
-
-    @OneToMany(mappedBy = "vocabularyWord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExamplePair> examples = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "level_id", nullable = false)
-    public Level level;
+    private Level level;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "pos_type", nullable = false)
     private PosType posType;
+
+    @OneToMany(mappedBy = "vocabularyWord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VocabularyWordTranslation> translations = new ArrayList<>();
 
 
     public String getWord() {
@@ -35,22 +32,6 @@ public class VocabularyWord extends AuditEntity {
 
     public void setWord(String word) {
         this.word = word;
-    }
-
-    public String getTranslation() {
-        return translation;
-    }
-
-    public void setTranslation(String translation) {
-        this.translation = translation;
-    }
-
-    public List<ExamplePair> getExamples() {
-        return examples;
-    }
-
-    public void setExamples(List<ExamplePair> examples) {
-        this.examples = examples;
     }
 
     public Level getLevel() {
@@ -67,6 +48,16 @@ public class VocabularyWord extends AuditEntity {
 
     public void setPosType(PosType posType) {
         this.posType = posType;
+    }
+
+    public void addTranslation(VocabularyWordTranslation tr) {
+        tr.setVocabularyWord(this);
+        translations.add(tr);
+    }
+
+    public void removeTranslation(VocabularyWordTranslation tr) {
+        translations.remove(tr);
+        tr.setVocabularyWord(null);
     }
 }
 

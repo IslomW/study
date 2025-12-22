@@ -1,26 +1,24 @@
 package com.sharom.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class GrammarRuleExample extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private GrammarRuleTranslation translation;
+    @JoinColumn(name = "translation_id", nullable = false)
+    private GrammarRuleTranslation grammarRuleTranslation;
 
     @Column(length = 2000)
     private String text;
 
 
     public GrammarRuleTranslation getTranslation() {
-        return translation;
+        return grammarRuleTranslation;
     }
 
-    public void setTranslation(GrammarRuleTranslation translation) {
-        this.translation = translation;
+    public void setTranslation(GrammarRuleTranslation grammarRuleTranslation) {
+        this.grammarRuleTranslation = grammarRuleTranslation;
     }
 
     public String getText() {

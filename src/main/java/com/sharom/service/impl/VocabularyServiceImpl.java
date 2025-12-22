@@ -1,116 +1,123 @@
 package com.sharom.service.impl;
 
-import com.sharom.entity.*;
+import com.sharom.entity.ExamplePair;
+import com.sharom.entity.Level;
+import com.sharom.entity.VocabularyWord;
+import com.sharom.entity.VocabularyWordTranslation;
 import com.sharom.enums.PosType;
 import com.sharom.exception.BadRequestException;
 import com.sharom.repository.ExamplePairRepository;
 import com.sharom.repository.LevelRepository;
 import com.sharom.repository.VocabularyRepository;
+import com.sharom.repository.VocabularyWordTranslationRepository;
 import com.sharom.service.VocabularyService;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
 public class VocabularyServiceImpl implements VocabularyService {
 
-    private final VocabularyRepository vocabularyRepository;
-    private final ExamplePairRepository examplePairRepository;
-    private final LevelRepository levelRepository;
-
-
-    public VocabularyServiceImpl(VocabularyRepository vocabularyRepository, ExamplePairRepository examplePairRepository, LevelRepository levelRepository) {
-        this.vocabularyRepository = vocabularyRepository;
-        this.examplePairRepository = examplePairRepository;
-        this.levelRepository = levelRepository;
-    }
+    @Inject
+    VocabularyRepository vocabularyRepository;
+    @Inject
+    VocabularyWordTranslationRepository translationRepository;
+    @Inject
+    ExamplePairRepository exampleRepository;
+    @Inject
+    LevelRepository levelRepository;
 
     @Override
-    public VocabularyWord addWord(VocabularyWord word) {
-        vocabularyRepository.persist(word);
-        return word;
+    @Transactional
+    public VocabularyWord createWord(String word, PosType posType, Long levelId) {
+        Level level = levelRepository.findByIdOptional(levelId)
+                .orElseThrow(BadRequestException::levelNotFound);
+
+        VocabularyWord vw = new VocabularyWord();
+        vw.setWord(word);
+        vw.setPosType(posType);
+        vw.setLevel(level);
+
+        vocabularyRepository.persist(vw);
+        return vw;
     }
 
     @Override
     @Transactional
-    public VocabularyWord addSentenceById(Long id, List<ExamplePair> sentences) {
-        VocabularyWord word = vocabularyRepository.findByIdOptional(id)
+    public VocabularyWordTranslation addTranslation(Long wordId, String lang, String translationText) {
+        VocabularyWord word = vocabularyRepository.findByIdOptional(wordId)
                 .orElseThrow(BadRequestException::vocabularyNotFound);
 
+        VocabularyWordTranslation translation = new VocabularyWordTranslation();
+        translation.setLang(lang);
+        translation.setTranslation(translationText);
+        word.addTranslation(translation);
 
-        for (ExamplePair sentence : sentences) {
-            sentence.setVocabularyWord(word);
-            word.getExamples().add(sentence);
-        }
-
-
-        return word;
-    }
-
-    @Override
-    public VocabularyWord updateWord(Long id, VocabularyWord word) {
-
-        VocabularyWord existing = vocabularyRepository.findById(id);
-        if (existing == null) {
-            throw BadRequestException.userNotFound();
-        }
-
-        existing.setWord(word.getWord());
-        existing.setLevel(word.getLevel());
-        existing.setPosType(word.getPosType());
-
-        return existing;
-    }
-
-
-    @Override
-    public VocabularyWord getWordById(Long id) {
-        return vocabularyRepository.findByIdOptional(id)
-                .orElseThrow(BadRequestException::vocabularyNotFound);
-    }
-
-    @Override
-    public List<VocabularyWord> getAllWordsFiltered(int level, String posType,int page, int size, String sortBy) {
-        return vocabularyRepository.findFiltered(
-                parhseLevel(level), parsePosType(posType), page, size, sortBy
-        );
-    }
-
-    @Override
-    public VocabularyWord getRandomWordByLevel(int level) {
-        long total = vocabularyRepository.countByLevel(parhseLevel(level));
-
-        if (total == 0) {
-            return null;
-        }
-
-        int randomIndex = ThreadLocalRandom.current()
-                .nextInt((int) total);
-
-        return vocabularyRepository
-                .findRandomByLevel(parhseLevel(level), randomIndex);
+        return translation;
     }
 
     @Override
     @Transactional
-    public void deleteExampleSentence(Long exampleId) {
-        ExamplePair example = examplePairRepository.findByIdOptional(exampleId)
-                .orElseThrow(BadRequestException::vocabularyNotFound);
+    public ExamplePair addExample(Long translationId, String exampleText) {
+        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
+                .orElseThrow(BadRequestException::dataNotFound);
 
-        examplePairRepository.deleteById(exampleId);
+        ExamplePair example = new ExamplePair();
+        example.setText(exampleText);
+        translation.addExample(example);
+
+        return example;
     }
 
     @Override
+    @Transactional
+    public VocabularyWordTranslation updateTranslation(Long translationId, String newText) {
+        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
+                .orElseThrow(BadRequestException::dataNotFound);
+
+        translation.setTranslation(newText);
+        return translation;
+    }
+
+    @Override
+    @Transactional
+    public ExamplePair updateExample(Long exampleId, String newText) {
+        ExamplePair example = exampleRepository.findByIdOptional(exampleId)
+                .orElseThrow(BadRequestException::dataNotFound);
+
+        example.setText(newText);
+        return example;
+    }
+
+    @Override
+    @Transactional
     public void deleteWord(Long wordId) {
-        vocabularyRepository.deleteById(wordId);
+        VocabularyWord word = vocabularyRepository.findByIdOptional(wordId)
+                .orElseThrow(BadRequestException::vocabularyNotFound);
+        vocabularyRepository.delete(word);
     }
 
-    private Level parhseLevel(int level){
-        return levelRepository.findByLevel(level)
-                .orElseThrow(BadRequestException::vocabularyNotFound);
+    @Override
+    @Transactional
+    public void deleteTranslation(Long translationId) {
+        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
+                .orElseThrow(BadRequestException::dataNotFound);
+        translationRepository.delete(translation);
     }
+
+    @Override
+    @Transactional
+    public void deleteExample(Long exampleId) {
+        ExamplePair example = exampleRepository.findByIdOptional(exampleId)
+                .orElseThrow(BadRequestException::dataNotFound);
+        exampleRepository.delete(example);
+    }
+
+
+    //    private Level parhseLevel(int level){
+//        return levelRepository.findByLevel(level)
+//                .orElseThrow(BadRequestException::vocabularyNotFound);
+//    }
 
     private PosType parsePosType(String posType) {
         if (posType == null || posType.isBlank()) {
@@ -123,5 +130,4 @@ public class VocabularyServiceImpl implements VocabularyService {
             throw BadRequestException.invalidPosType();
         }
     }
-
 }

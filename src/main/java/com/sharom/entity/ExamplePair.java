@@ -3,17 +3,28 @@ package com.sharom.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "example_pairs")
 public class ExamplePair extends AuditEntity {
-    @Column(name = "sentence", length = 500)
-    private String sentence;
-
-    @Column(name = "translation", length = 500)
-    private String translation;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "word_id")
-    private VocabularyWord vocabularyWord;
+    @JoinColumn(name = "translation_id", nullable = false)
+    private VocabularyWordTranslation translation;
+
+    @Column(name = "sentence", length = 500)
+    private String sentence;
+
+    @Column(length = 2000, nullable = false)
+    private String text;
+
+
+    public VocabularyWordTranslation getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(VocabularyWordTranslation translation) {
+        this.translation = translation;
+    }
 
     public String getSentence() {
         return sentence;
@@ -23,22 +34,11 @@ public class ExamplePair extends AuditEntity {
         this.sentence = sentence;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getText() {
+        return text;
     }
 
-    public void setTranslation(String translation) {
-        this.translation = translation;
+    public void setText(String text) {
+        this.text = text;
     }
-
-    public VocabularyWord getVocabularyWord() {
-        return vocabularyWord;
-    }
-
-    public void setVocabularyWord(VocabularyWord vocabularyWord) {
-        this.vocabularyWord = vocabularyWord;
-    }
-
-
-    // Геттеры, сеттеры и конструкторы
 }

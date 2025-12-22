@@ -28,8 +28,9 @@ public class JwtService {
 
         return Jwt.issuer("study-service")
                 .subject(user.getEmail())
-                .groups(Set.of(user.getRole()).toString())
-                .expiresAt(ACCESS_TTL)
+                .groups(Set.of(user.getRole().name()))
+                .claim("lang", user.getLang())
+                .expiresAt(Instant.now().plusSeconds(ACCESS_TTL))
                 .sign();
     }
 
