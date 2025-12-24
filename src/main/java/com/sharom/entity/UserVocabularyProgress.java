@@ -3,9 +3,11 @@ package com.sharom.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user_learned_words")
-public class UserLearnedWord extends BaseEntity {
+public class UserVocabularyProgress extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -16,4 +18,8 @@ public class UserLearnedWord extends BaseEntity {
 
     private boolean learned; // true если слово изучено
 
+    private int correctStreak;    // подряд правильных
+    private int wrongCount;       // ошибок
+
+    private LocalDateTime lastSeen;
 }

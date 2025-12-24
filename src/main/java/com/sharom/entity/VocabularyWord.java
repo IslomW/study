@@ -50,6 +50,10 @@ public class VocabularyWord extends AuditEntity {
         this.posType = posType;
     }
 
+    public List<VocabularyWordTranslation> getTranslations() {
+        return translations;
+    }
+
     public void addTranslation(VocabularyWordTranslation tr) {
         tr.setVocabularyWord(this);
         translations.add(tr);

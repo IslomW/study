@@ -1,12 +1,11 @@
 package com.sharom.service.impl;
 
-import com.sharom.entity.ExamplePair;
-import com.sharom.entity.Quiz;
-import com.sharom.entity.QuizQuestion;
-import com.sharom.entity.VocabularyWord;
+import com.sharom.entity.*;
 import com.sharom.exception.BadRequestException;
 import com.sharom.repository.ExamplePairRepository;
+import com.sharom.repository.UserVocabularyProgressRepository;
 import com.sharom.repository.VocabularyRepository;
+import com.sharom.repository.VocabularyWordTranslationRepository;
 import com.sharom.service.QuizService;
 import com.sharom.utils.UserContextService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -28,7 +27,14 @@ public class QuizServiceImpl implements QuizService {
     VocabularyRepository vocabularyRepository;
 
     @Inject
+    VocabularyWordTranslationRepository vocabularyTranslationRepository;
+
+    @Inject
     I18nService i18nService;
+
+    @Inject
+    UserVocabularyProgressRepository progressRepository;
+
 
     @Inject
     UserContextService userContextService;
@@ -90,4 +96,76 @@ public class QuizServiceImpl implements QuizService {
 
         return question;
     }
+
+
+
+
+    private void generateVocabularyQuestionsFromProgress(
+            Quiz quiz,
+            User user,
+            int count
+    ) {
+
+        List<VocabularyWord> learnedWords =
+                progressRepository.findLearnedWords(user);
+
+        if (learnedWords.isEmpty()) {
+            throw new IllegalStateException("User has no learned words");
+        }
+
+        Collections.shuffle(learnedWords);
+
+        int limit = Math.min(count, learnedWords.size());
+
+        for (int i = 0; i < limit; i++) {
+
+            VocabularyWord word = learnedWords.get(i);
+
+            QuizQuestion q = new QuizQuestion();
+            q.setQuiz(quiz);
+            q.setQuestionText("Translate: " + word.getWord());
+
+            List<String> options = generateOptions(word);
+            q.setOptions(options);
+            q.setCorrectAnswerIndex(
+                    options.indexOf(getCorrectTranslation(word, userContextService.getLanguage()))
+            );
+
+            quiz.getQuestions().add(q);
+        }
+    }
+
+    private List<String> generateOptions(VocabularyWord word) {
+
+        String correct = getCorrectTranslation(word, userContextService.getLanguage());
+
+        List<String> options = new ArrayList<>();
+        options.add(correct);
+
+        List<String> randomTranslations =
+                vocabularyRepository.findRandomTranslationsExcluding(word.getId(), userContextService.getLanguage(), 3);
+
+        options.addAll(randomTranslations.stream()
+                .filter(t -> !t.equals(correct))
+                .toList());
+
+        Collections.shuffle(options);
+        return options;
+    }
+
+
+    private String getCorrectTranslation(VocabularyWord word, String lang) {
+        return vocabularyTranslationRepository
+                .findTranslation(word.getId(), lang)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "No translation for word " + word.getId() + " and lang " + lang
+                        )
+                );
+    }
+
+
+
+
+
 }

@@ -64,6 +64,26 @@ public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
                 .collect(Collectors.toList());
     }
 
+    public List<String> findRandomTranslationsExcluding(
+            Long excludeWordId,
+            String lang,
+            int limit
+    ) {
+        return getEntityManager()
+                .createQuery("""
+                SELECT t.translation
+                FROM VocabularyWordTranslation t
+                WHERE t.vocabularyWord.id <> :wordId
+                  AND t.lang = :lang
+                ORDER BY RANDOM()
+                """, String.class)
+                .setParameter("wordId", excludeWordId)
+                .setParameter("lang", lang)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+
     public List<VocabularyWord> findLearnedWords(Long userId) {
         return list(
                 "SELECT w FROM VocabularyWord w JOIN UserLearnedWord ulw ON ulw.word = w " +
