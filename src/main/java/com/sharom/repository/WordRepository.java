@@ -16,6 +16,16 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class WordRepository implements PanacheRepository<Word> {
 
+    public List<Word> findAllPaged(int page, int size) {
+        return findAll()
+                .page(Page.of(page, size))  // Page.of(pageIndex, pageSize)
+                .list();
+    }
+
+    public long countWords() {
+        return count();
+    }
+
     public List<Word> findFiltered(
             Level level,
             PosType posType,
@@ -58,30 +68,12 @@ public class WordRepository implements PanacheRepository<Word> {
     public List<String> findRandomWordsExcluding(Long excludeWordId, int count) {
         List<Word> words = list("id != ?1", excludeWordId);
         return words.stream()
-                .map(Word::getWord)
+                .map(Word::getText)
                 .sorted((a, b) -> (int) (Math.random() * 1000)) // перемешиваем
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    public List<String> findRandomTranslationsExcluding(
-            Long excludeWordId,
-            String lang,
-            int limit
-    ) {
-        return getEntityManager()
-                .createQuery("""
-                SELECT t.translation
-                FROM VocabularyWordTranslation t
-                WHERE t.word.id <> :wordId
-                  AND t.lang = :lang
-                ORDER BY RANDOM()
-                """, String.class)
-                .setParameter("wordId", excludeWordId)
-                .setParameter("lang", lang)
-                .setMaxResults(limit)
-                .getResultList();
-    }
 
 
     public List<Word> findLearnedWords(Long userId) {

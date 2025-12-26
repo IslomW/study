@@ -51,7 +51,7 @@ public class QuizServiceImpl implements QuizService {
 
         List<Word> words = wordRepository.findLearnedWords(userId);
         if (words.isEmpty()) {
-            throw BadRequestException.vocabularyNotFound();
+            throw BadRequestException.wordNotFound();
         }
         Collections.shuffle(words);
 
@@ -71,28 +71,28 @@ public class QuizServiceImpl implements QuizService {
         Example example = exampleRepository.findRandomByStudentLearnedWord(word.getId())
                 .orElseThrow(BadRequestException::examplePariNotFound);
 
-        String text = example.getText();
-        String questionText = text.replaceFirst(
-                "\\b" + Pattern.quote(word.getWord()) + "\\b", "____"
-        );
+//        String text = example.getText();
+//        String questionText = text.replaceFirst(
+//                "\\b" + Pattern.quote(word.getWord()) + "\\b", "____"
+//        );
+//
+//        String correctAnswer = word.getWord();
 
-        String correctAnswer = word.getWord();
-
-        List<String> options = new ArrayList<>();
-        options.add(correctAnswer);
-
-        List<String> distractors = wordRepository
-                .findRandomWordsExcluding(word.getId(), 3);
-
-        options.addAll(distractors);
-
-        Collections.shuffle(options);
-
-
+//        List<String> options = new ArrayList<>();
+//        options.add(correctAnswer);
+//
+//        List<String> distractors = wordRepository
+//                .findRandomWordsExcluding(word.getId(), 3);
+//
+//        options.addAll(distractors);
+//
+//        Collections.shuffle(options);
+//
+//
         QuizQuestion question = new QuizQuestion();
-        question.setQuestionText(questionText);
-        question.setOptions(options);
-        question.setCorrectAnswerIndex(options.indexOf(correctAnswer));
+//        question.setQuestionText(questionText);
+//        question.setOptions(options);
+//        question.setCorrectAnswerIndex(options.indexOf(correctAnswer));
 
         return question;
     }
@@ -106,50 +106,50 @@ public class QuizServiceImpl implements QuizService {
             int count
     ) {
 
-        List<Word> learnedWords =
-                progressRepository.findLearnedWords(user);
-
-        if (learnedWords.isEmpty()) {
-            throw new IllegalStateException("User has no learned words");
-        }
-
-        Collections.shuffle(learnedWords);
-
-        int limit = Math.min(count, learnedWords.size());
-
-        for (int i = 0; i < limit; i++) {
-
-            Word word = learnedWords.get(i);
-
-            QuizQuestion q = new QuizQuestion();
-            q.setQuiz(quiz);
-            q.setQuestionText("Translate: " + word.getWord());
-
-            List<String> options = generateOptions(word);
-            q.setOptions(options);
-            q.setCorrectAnswerIndex(
-                    options.indexOf(getCorrectTranslation(word, userContextService.getLanguage()))
-            );
-
-            quiz.getQuestions().add(q);
-        }
+//        List<Word> learnedWords =
+//                progressRepository.findLearnedWords(user);
+//
+//        if (learnedWords.isEmpty()) {
+//            throw new IllegalStateException("User has no learned words");
+//        }
+//
+//        Collections.shuffle(learnedWords);
+//
+//        int limit = Math.min(count, learnedWords.size());
+//
+//        for (int i = 0; i < limit; i++) {
+//
+//            Word word = learnedWords.get(i);
+//
+//            QuizQuestion q = new QuizQuestion();
+//            q.setQuiz(quiz);
+//            q.setQuestionText("Translate: " + word.getWord());
+//
+//            List<String> options = generateOptions(word);
+//            q.setOptions(options);
+//            q.setCorrectAnswerIndex(
+//                    options.indexOf(getCorrectTranslation(word, userContextService.getLanguage()))
+//            );
+//
+//            quiz.getQuestions().add(q);
+//        }
     }
 
     private List<String> generateOptions(Word word) {
 
-        String correct = getCorrectTranslation(word, userContextService.getLanguage());
-
+//        String correct = getCorrectTranslation(word, userContextService.getLanguage());
+//
         List<String> options = new ArrayList<>();
-        options.add(correct);
-
-        List<String> randomTranslations =
-                wordRepository.findRandomTranslationsExcluding(word.getId(), userContextService.getLanguage(), 3);
-
-        options.addAll(randomTranslations.stream()
-                .filter(t -> !t.equals(correct))
-                .toList());
-
-        Collections.shuffle(options);
+//        options.add(correct);
+//
+//        List<String> randomTranslations =
+//                wordRepository.findRandomTranslationsExcluding(word.getId(), userContextService.getLanguage(), 3);
+//
+//        options.addAll(randomTranslations.stream()
+//                .filter(t -> !t.equals(correct))
+//                .toList());
+//
+//        Collections.shuffle(options);
         return options;
     }
 

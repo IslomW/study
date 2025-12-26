@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "vocabulary_words")
+@Table(name = "word")
 public class Word extends AuditEntity {
 
     @Column(nullable = false)
@@ -38,7 +38,7 @@ public class Word extends AuditEntity {
     private List<WordTranslation> translations = new ArrayList<>();
 
     // Примеры, относящиеся к исходному слову
-    @OneToMany(mappedBy = "Word", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Example> examples = new ArrayList<>();
 
     public String getText() {

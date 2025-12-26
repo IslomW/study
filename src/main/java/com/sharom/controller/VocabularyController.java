@@ -1,10 +1,7 @@
 package com.sharom.controller;
 
 import com.sharom.dto.*;
-import com.sharom.entity.Example;
-import com.sharom.entity.ExampleTranslation;
-import com.sharom.entity.Word;
-import com.sharom.entity.WordTranslation;
+import com.sharom.entity.*;
 import com.sharom.service.VocabularyService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -18,6 +15,16 @@ public class VocabularyController {
 
     @Inject
     VocabularyService vocabularyService;
+
+    // ------------------- Lang -------------------
+
+    @POST
+    @Path("/lang")
+    public Response createLang(CreateLangRequest req) {
+        Language language = vocabularyService.addLanguage(req);
+        return Response.status(Response.Status.CREATED).entity(language).build();
+    }
+
 
     // ------------------- Words -------------------
 
