@@ -14,7 +14,7 @@ public class UserVocabularyProgress extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vocabulary_word_id")
-    private VocabularyWord word;
+    private Word word;
 
     private boolean learned; // true если слово изучено
 

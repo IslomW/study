@@ -1,25 +1,34 @@
 package com.sharom.service;
 
-import com.sharom.entity.ExamplePair;
-import com.sharom.entity.VocabularyWord;
-import com.sharom.entity.VocabularyWordTranslation;
+import com.sharom.dto.CreateExampleRequest;
+import com.sharom.dto.CreateExampleTranslationRequest;
+import com.sharom.dto.CreateTranslationRequest;
+import com.sharom.dto.CreateWordRequest;
+import com.sharom.entity.Example;
+import com.sharom.entity.ExampleTranslation;
+import com.sharom.entity.Word;
+import com.sharom.entity.WordTranslation;
 import com.sharom.enums.PosType;
 
 public interface VocabularyService {
 
-    VocabularyWord createWord(String word, PosType posType, Long levelId);
+    Word createWord(CreateWordRequest req);
 
-    VocabularyWordTranslation addTranslation(Long wordId, String lang, String translationText);
+    WordTranslation addTranslation(CreateTranslationRequest req);
 
-    ExamplePair addExample(Long translationId, String exampleText);
+    Example addExample(CreateExampleRequest req);
 
-    VocabularyWordTranslation updateTranslation(Long translationId, String newText);
+    ExampleTranslation addExampleTranslation(CreateExampleTranslationRequest req);
 
-    ExamplePair updateExample(Long exampleId, String newText);
+    WordTranslation updateTranslation(Long translationId, String newText);
+
+    Example updateExample(Long exampleId, String newText);
 
     void deleteWord(Long wordId);
 
     void deleteTranslation(Long translationId);
 
     void deleteExample(Long exampleId);
+
+    void deleteExampleTranslation(Long exampleTranslationId);
 }

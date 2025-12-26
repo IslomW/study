@@ -21,6 +21,10 @@ public class BadRequestException extends RuntimeException {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.USER_NOT_FOUND.getCode());
     }
 
+    public static BadRequestException translationAlreadyExists(){
+        return new BadRequestException(Response.Status.BAD_REQUEST, Method.TRANSLATION_ALREADY_EXISTS.getCode());
+    }
+
     public static BadRequestException dataNotFound(){
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
     }
@@ -34,7 +38,7 @@ public class BadRequestException extends RuntimeException {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.USER_ALREADY_EXISTS.getCode());
     }
 
-    public static BadRequestException vocabularyNotFound() {
+    public static BadRequestException wordNotFound() {
         return new BadRequestException(Response.Status.BAD_REQUEST, Method.DATA_NOT_FOUND.getCode());
     }
 

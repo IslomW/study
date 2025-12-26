@@ -1,8 +1,8 @@
 package com.sharom.repository;
 
 import com.sharom.entity.Level;
+import com.sharom.entity.Word;
 import com.sharom.enums.PosType;
-import com.sharom.entity.VocabularyWord;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
+public class WordRepository implements PanacheRepository<Word> {
 
-    public List<VocabularyWord> findFiltered(
+    public List<Word> findFiltered(
             Level level,
             PosType posType,
             int page,
@@ -49,16 +49,16 @@ public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
         return count("level", level);
     }
 
-    public VocabularyWord findRandomByLevel(Level level, int index) {
+    public Word findRandomByLevel(Level level, int index) {
         return find("level", level)
                 .page(Page.of(index, 1))
                 .firstResult();
     }
 
     public List<String> findRandomWordsExcluding(Long excludeWordId, int count) {
-        List<VocabularyWord> words = list("id != ?1", excludeWordId);
+        List<Word> words = list("id != ?1", excludeWordId);
         return words.stream()
-                .map(VocabularyWord::getWord)
+                .map(Word::getWord)
                 .sorted((a, b) -> (int) (Math.random() * 1000)) // перемешиваем
                 .limit(count)
                 .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
                 .createQuery("""
                 SELECT t.translation
                 FROM VocabularyWordTranslation t
-                WHERE t.vocabularyWord.id <> :wordId
+                WHERE t.word.id <> :wordId
                   AND t.lang = :lang
                 ORDER BY RANDOM()
                 """, String.class)
@@ -84,9 +84,9 @@ public class VocabularyRepository implements PanacheRepository<VocabularyWord> {
     }
 
 
-    public List<VocabularyWord> findLearnedWords(Long userId) {
+    public List<Word> findLearnedWords(Long userId) {
         return list(
-                "SELECT w FROM VocabularyWord w JOIN UserLearnedWord ulw ON ulw.word = w " +
+                "SELECT w FROM Word w JOIN UserLearnedWord ulw ON ulw.word = w " +
                         "WHERE ulw.user.id = ?1 AND ulw.learned = true",
                 userId
         );

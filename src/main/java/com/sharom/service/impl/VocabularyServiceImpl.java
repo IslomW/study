@@ -1,15 +1,13 @@
 package com.sharom.service.impl;
 
-import com.sharom.entity.ExamplePair;
-import com.sharom.entity.Level;
-import com.sharom.entity.VocabularyWord;
-import com.sharom.entity.VocabularyWordTranslation;
+import com.sharom.dto.CreateExampleRequest;
+import com.sharom.dto.CreateExampleTranslationRequest;
+import com.sharom.dto.CreateTranslationRequest;
+import com.sharom.dto.CreateWordRequest;
+import com.sharom.entity.*;
 import com.sharom.enums.PosType;
 import com.sharom.exception.BadRequestException;
-import com.sharom.repository.ExamplePairRepository;
-import com.sharom.repository.LevelRepository;
-import com.sharom.repository.VocabularyRepository;
-import com.sharom.repository.VocabularyWordTranslationRepository;
+import com.sharom.repository.*;
 import com.sharom.service.VocabularyService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,70 +17,111 @@ import jakarta.transaction.Transactional;
 public class VocabularyServiceImpl implements VocabularyService {
 
     @Inject
-    VocabularyRepository vocabularyRepository;
+    WordRepository wordRepository;
     @Inject
-    VocabularyWordTranslationRepository translationRepository;
+    WordTranslationRepository translationRepository;
     @Inject
-    ExamplePairRepository exampleRepository;
+    ExampleRepository exampleRepository;
+    @Inject
+    ExampleTranslationRepository exampleTranslationRepository;
     @Inject
     LevelRepository levelRepository;
+    @Inject
+    LanguageRepository languageRepository;
 
     @Override
     @Transactional
-    public VocabularyWord createWord(String word, PosType posType, Long levelId) {
-        Level level = levelRepository.findByIdOptional(levelId)
+    public Word createWord(CreateWordRequest req) {
+        Level level = levelRepository.findByIdOptional(req.levelId())
                 .orElseThrow(BadRequestException::levelNotFound);
 
-        VocabularyWord vw = new VocabularyWord();
-        vw.setWord(word);
-        vw.setPosType(posType);
-        vw.setLevel(level);
+        Language language = languageRepository.findByCode(req.lang().toUpperCase())
+                .orElseThrow(BadRequestException::dataNotFound);
 
-        vocabularyRepository.persist(vw);
+        Word vw = new Word();
+        vw.setText(req.word());
+        vw.setLanguage(language);
+        vw.setLevel(level);
+        vw.setPosType(req.posType());
+
+        wordRepository.persist(vw);
         return vw;
     }
 
     @Override
     @Transactional
-    public VocabularyWordTranslation addTranslation(Long wordId, String lang, String translationText) {
-        VocabularyWord word = vocabularyRepository.findByIdOptional(wordId)
-                .orElseThrow(BadRequestException::vocabularyNotFound);
+    public WordTranslation addTranslation(CreateTranslationRequest req) {
+        Word word = wordRepository.findByIdOptional(req.wordId())
+                .orElseThrow(BadRequestException::wordNotFound);
 
-        VocabularyWordTranslation translation = new VocabularyWordTranslation();
-        translation.setLang(lang);
-        translation.setTranslation(translationText);
-        word.addTranslation(translation);
+        Language language = languageRepository.findByCode(req.lang().toUpperCase())
+                .orElseThrow(BadRequestException::dataNotFound);
+
+        // check
+        if (translationRepository.existsByWordAndLanguage(word, language)) {
+            throw BadRequestException.translationAlreadyExists();
+        }
+
+        WordTranslation translation = new WordTranslation();
+        translation.setWord(word);
+        translation.setLanguage(language);
+        translation.setText(req.translation());
+
+        translationRepository.persist(translation);
 
         return translation;
     }
 
     @Override
     @Transactional
-    public ExamplePair addExample(Long translationId, String exampleText) {
-        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
-                .orElseThrow(BadRequestException::dataNotFound);
+    public Example addExample(CreateExampleRequest req) {
 
-        ExamplePair example = new ExamplePair();
-        example.setText(exampleText);
-        translation.addExample(example);
+        Word word = wordRepository.findByIdOptional(req.wordId())
+                .orElseThrow(BadRequestException::wordNotFound);
+
+        Example example = new Example();
+        example.setText(req.text());
+        example.setWord(word);
+
+        exampleRepository.persist(example);
 
         return example;
     }
 
     @Override
     @Transactional
-    public VocabularyWordTranslation updateTranslation(Long translationId, String newText) {
-        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
+    public ExampleTranslation addExampleTranslation(CreateExampleTranslationRequest req) {
+
+        Example example = exampleRepository.findByIdOptional(req.exampleId())
                 .orElseThrow(BadRequestException::dataNotFound);
 
-        translation.setTranslation(newText);
+        Language language = languageRepository.findByCode(req.lang().toUpperCase())
+                .orElseThrow(BadRequestException::dataNotFound);
+
+        ExampleTranslation exampleTranslation = new ExampleTranslation();
+        exampleTranslation.setExample(example);
+        exampleTranslation.setLanguage(language);
+        exampleTranslation.setText(req.translation());
+
+        exampleTranslationRepository.persist(exampleTranslation);
+
+        return exampleTranslation;
+    }
+
+    @Override
+    @Transactional
+    public WordTranslation updateTranslation(Long translationId, String newText) {
+        WordTranslation translation = translationRepository.findByIdOptional(translationId)
+                .orElseThrow(BadRequestException::dataNotFound);
+
+//        translation.setTranslation(newText);
         return translation;
     }
 
     @Override
     @Transactional
-    public ExamplePair updateExample(Long exampleId, String newText) {
-        ExamplePair example = exampleRepository.findByIdOptional(exampleId)
+    public Example updateExample(Long exampleId, String newText) {
+        Example example = exampleRepository.findByIdOptional(exampleId)
                 .orElseThrow(BadRequestException::dataNotFound);
 
         example.setText(newText);
@@ -92,15 +131,15 @@ public class VocabularyServiceImpl implements VocabularyService {
     @Override
     @Transactional
     public void deleteWord(Long wordId) {
-        VocabularyWord word = vocabularyRepository.findByIdOptional(wordId)
-                .orElseThrow(BadRequestException::vocabularyNotFound);
-        vocabularyRepository.delete(word);
+        Word word = wordRepository.findByIdOptional(wordId)
+                .orElseThrow(BadRequestException::wordNotFound);
+        wordRepository.delete(word);
     }
 
     @Override
     @Transactional
     public void deleteTranslation(Long translationId) {
-        VocabularyWordTranslation translation = translationRepository.findByIdOptional(translationId)
+        WordTranslation translation = translationRepository.findByIdOptional(translationId)
                 .orElseThrow(BadRequestException::dataNotFound);
         translationRepository.delete(translation);
     }
@@ -108,9 +147,17 @@ public class VocabularyServiceImpl implements VocabularyService {
     @Override
     @Transactional
     public void deleteExample(Long exampleId) {
-        ExamplePair example = exampleRepository.findByIdOptional(exampleId)
+        Example example = exampleRepository.findByIdOptional(exampleId)
                 .orElseThrow(BadRequestException::dataNotFound);
         exampleRepository.delete(example);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExampleTranslation(Long exampleTranslationId){
+        ExampleTranslation exampleTranslation = exampleTranslationRepository.findByIdOptional(exampleTranslationId)
+                .orElseThrow(BadRequestException::dataNotFound);
+        exampleTranslationRepository.delete(exampleTranslation);
     }
 
 

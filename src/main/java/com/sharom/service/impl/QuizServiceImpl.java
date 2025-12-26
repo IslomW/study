@@ -2,10 +2,10 @@ package com.sharom.service.impl;
 
 import com.sharom.entity.*;
 import com.sharom.exception.BadRequestException;
-import com.sharom.repository.ExamplePairRepository;
+import com.sharom.repository.ExampleRepository;
 import com.sharom.repository.UserVocabularyProgressRepository;
-import com.sharom.repository.VocabularyRepository;
-import com.sharom.repository.VocabularyWordTranslationRepository;
+import com.sharom.repository.WordRepository;
+import com.sharom.repository.WordTranslationRepository;
 import com.sharom.service.QuizService;
 import com.sharom.utils.UserContextService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -20,14 +20,14 @@ import java.util.regex.Pattern;
 public class QuizServiceImpl implements QuizService {
 
     @Inject
-    ExamplePairRepository exampleRepository;
+    ExampleRepository exampleRepository;
 
 
     @Inject
-    VocabularyRepository vocabularyRepository;
+    WordRepository wordRepository;
 
     @Inject
-    VocabularyWordTranslationRepository vocabularyTranslationRepository;
+    WordTranslationRepository vocabularyTranslationRepository;
 
     @Inject
     I18nService i18nService;
@@ -49,7 +49,7 @@ public class QuizServiceImpl implements QuizService {
 
         quiz.setTitle(i18nService.getMessage("quiz.title.fill_in_blank", lang));
 
-        List<VocabularyWord> words = vocabularyRepository.findLearnedWords(userId);
+        List<Word> words = wordRepository.findLearnedWords(userId);
         if (words.isEmpty()) {
             throw BadRequestException.vocabularyNotFound();
         }
@@ -66,9 +66,9 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuizQuestion generateFillInTheBlankQuestion(VocabularyWord word) {
+    public QuizQuestion generateFillInTheBlankQuestion(Word word) {
 
-        ExamplePair example = exampleRepository.findRandomByStudentLearnedWord(word.getId())
+        Example example = exampleRepository.findRandomByStudentLearnedWord(word.getId())
                 .orElseThrow(BadRequestException::examplePariNotFound);
 
         String text = example.getText();
@@ -81,7 +81,7 @@ public class QuizServiceImpl implements QuizService {
         List<String> options = new ArrayList<>();
         options.add(correctAnswer);
 
-        List<String> distractors = vocabularyRepository
+        List<String> distractors = wordRepository
                 .findRandomWordsExcluding(word.getId(), 3);
 
         options.addAll(distractors);
@@ -106,7 +106,7 @@ public class QuizServiceImpl implements QuizService {
             int count
     ) {
 
-        List<VocabularyWord> learnedWords =
+        List<Word> learnedWords =
                 progressRepository.findLearnedWords(user);
 
         if (learnedWords.isEmpty()) {
@@ -119,7 +119,7 @@ public class QuizServiceImpl implements QuizService {
 
         for (int i = 0; i < limit; i++) {
 
-            VocabularyWord word = learnedWords.get(i);
+            Word word = learnedWords.get(i);
 
             QuizQuestion q = new QuizQuestion();
             q.setQuiz(quiz);
@@ -135,7 +135,7 @@ public class QuizServiceImpl implements QuizService {
         }
     }
 
-    private List<String> generateOptions(VocabularyWord word) {
+    private List<String> generateOptions(Word word) {
 
         String correct = getCorrectTranslation(word, userContextService.getLanguage());
 
@@ -143,7 +143,7 @@ public class QuizServiceImpl implements QuizService {
         options.add(correct);
 
         List<String> randomTranslations =
-                vocabularyRepository.findRandomTranslationsExcluding(word.getId(), userContextService.getLanguage(), 3);
+                wordRepository.findRandomTranslationsExcluding(word.getId(), userContextService.getLanguage(), 3);
 
         options.addAll(randomTranslations.stream()
                 .filter(t -> !t.equals(correct))
@@ -154,7 +154,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    private String getCorrectTranslation(VocabularyWord word, String lang) {
+    private String getCorrectTranslation(Word word, String lang) {
         return vocabularyTranslationRepository
                 .findTranslation(word.getId(), lang)
                 .orElseThrow(() ->

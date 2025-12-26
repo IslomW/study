@@ -1,5 +1,7 @@
 package com.sharom.dto;
 
-public record CreateTranslationRequest(String lang,
-                                       String translation) {
+public record CreateTranslationRequest(Long wordId,
+                                       String lang,
+                                       String translation
+) {
 }

@@ -1,7 +1,7 @@
 package com.sharom.repository;//package com.sharom.repository;
 //
-//import com.sharom.entity.VocabularyWord;
+//import com.sharom.entity.Word;
 //import io.quarkus.hibernate.orm.panache.PanacheRepository;
 //
-//public interface VocabularyWordRepository extends PanacheRepository<VocabularyWord> {
+//public interface VocabularyWordRepository extends PanacheRepository<Word> {
 //}

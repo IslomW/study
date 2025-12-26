@@ -1,4 +1,5 @@
 package com.sharom.dto;
 
-public record CreateExampleRequest(String text) {
+public record CreateExampleRequest(Long wordId,
+                                   String text) {
 }

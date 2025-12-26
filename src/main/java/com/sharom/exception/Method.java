@@ -4,6 +4,7 @@ public enum Method {
     DATA_NOT_FOUND("data.not.found"),
     USER_NOT_FOUND("user.not.found"),
     USER_ALREADY_EXISTS("user.already.exists"),
+    TRANSLATION_ALREADY_EXISTS("translation.already.exists"),
     EXAMPLE_NOT_FOUND("example.not.found"),
     INVALID_PASSWORD("invalid.password"),
     INVALID_POST_TYPE("invalid.post.type");

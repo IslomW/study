@@ -1,9 +1,9 @@
 package com.sharom.service;
 
 import com.sharom.entity.QuizQuestion;
-import com.sharom.entity.VocabularyWord;
+import com.sharom.entity.Word;
 
 public interface QuizService {
-    QuizQuestion generateFillInTheBlankQuestion(VocabularyWord word);
+    QuizQuestion generateFillInTheBlankQuestion(Word word);
 
 }
