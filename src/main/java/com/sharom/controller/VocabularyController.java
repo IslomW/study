@@ -39,7 +39,8 @@ public class VocabularyController {
     @Path("/{wordId}/translations")
     public Response addTranslation(@PathParam("wordId") Long wordId, CreateTranslationRequest req) {
         VocabularyWordTranslation translation = vocabularyService.addTranslation(wordId, req.lang(), req.translation());
-        return Response.status(Response.Status.CREATED).entity(translation).build();
+        TranslationResponse resp = new TranslationResponse(translation.getId(), translation.getLang(), translation.getTranslation());
+        return Response.status(Response.Status.CREATED).entity(resp).build();
     }
 
     @PUT

@@ -6,10 +6,14 @@ import jakarta.persistence.*;
 @Table(name = "example_pairs")
 public class ExamplePair extends AuditEntity {
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "translation_id", nullable = false)
     private VocabularyWordTranslation translation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vocabulary_word_id")
+    private VocabularyWord vocabularyWord;
+
 
     @Column(name = "sentence", length = 500)
     private String sentence;

@@ -22,6 +22,11 @@ public class VocabularyWord extends AuditEntity {
     @Column(name = "pos_type", nullable = false)
     private PosType posType;
 
+
+    // Примеры, относящиеся к исходному слову
+    @OneToMany(mappedBy = "vocabularyWord", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ExamplePair> examples = new ArrayList<>();
+
     @OneToMany(mappedBy = "vocabularyWord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VocabularyWordTranslation> translations = new ArrayList<>();
 

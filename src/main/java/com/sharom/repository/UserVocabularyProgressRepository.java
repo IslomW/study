@@ -4,9 +4,11 @@ import com.sharom.entity.User;
 import com.sharom.entity.UserVocabularyProgress;
 import com.sharom.entity.VocabularyWord;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 
+@ApplicationScoped
 public class UserVocabularyProgressRepository
         implements PanacheRepository<UserVocabularyProgress> {
 

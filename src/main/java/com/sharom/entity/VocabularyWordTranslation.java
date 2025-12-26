@@ -6,8 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "vocabulary_word_translations")
-public class VocabularyWordTranslation extends BaseEntity{
+@Table(name = "vocabulary_word_translations",
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_translation_idx",
+                columnNames = {"vocabulary_word_id", "lang"}
+        )
+)
+public class VocabularyWordTranslation extends BaseEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
